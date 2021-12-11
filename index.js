@@ -1,26 +1,28 @@
+// Discovery options match any devices advertising:
+// . The standard heart rate service.
+// . Both 16-bit service IDs 0x1802 and 0x1803.
+// . A proprietary 128-bit UUID service c48e6067-5295-48d3-8d5c-0395f61792b1.
+// . Devices with name "ExampleName".
+// . Devices with name starting with "Prefix".
+//
+// And enables access to the battery service if devices
+// include it, even if devices do not advertise that service.
+console.log("Updated")
+let options = {
+  filters: [
+    {services: ['heart_rate']},
+    {services: [0x1802, 0x1803]},
+    {services: ['c48e6067-5295-48d3-8d5c-0395f61792b1']},
+    {name: 'ExampleName'},
+    {namePrefix: 'Prefix'}
+  ],
+  optionalServices: ['battery_service']
+}
 
-// Step 1: Scan for a device with 0xffe5 service
-navigator.bluetooth.requestDevice({
-    filters: [{ services: [0xffe5] }]
-  })
-    .then(function(device) {
-      // Step 2: Connect to it
-      return device.gatt.connect();
-    })
-    .then(function(server) {
-      // Step 3: Get the Service
-      return server.getPrimaryService(0xffe5);
-    })
-    .then(function(service) {
-      // Step 4: get the Characteristic
-      return service.getCharacteristic(0xffe9);
-    })
-    .then(function(characteristic) {
-      // Step 5: Write to the characteristic
-      var data = new Uint8Array([0xbb, 0x25, 0x05, 0x44]);
-      return characteristic.writeValue(data);
-    })
-    .catch(function(error) {
-       // And of course: error handling!
-       console.error('Connection failed!', error);
-    });
+navigator.bluetooth.requestDevice(options).then(function(device) {
+  console.log('Name: ' + device.name);
+  // Do something with the device.
+})
+.catch(function(error) {
+  console.log("Something went wrong. " + error);
+});
